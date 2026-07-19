@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ClassTrack – Student Portal</title>
+<meta name="description" content="View your attendance and timetable in one place." />
+<meta name="theme-color" content="#E85D9B" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" href="./logo.png" />
+<link rel="apple-touch-icon" href="./logo.png" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+<!-- Splash / auth-check screen -->
+<div id="splash" class="splash">
+  <div class="splash__mark">
+    <img src="./logo.png" alt="ClassTrack logo" class="splash__logo" />
+  </div>
+  <p>ClassTrack</p>
+</div>
+
+<div id="toastHost" class="toast-host" aria-live="polite"></div>
+
+<!-- ============================================================ -->
+<!-- AUTH GATE                                                      -->
+<!-- ============================================================ -->
+<div id="authGate" class="auth-gate is-hidden">
+
+  <!-- Welcome -->
+  <section class="auth-view is-active" data-auth-view="welcome">
+    <div class="auth-hero">
+      <img src="./logo.png" alt="ClassTrack logo" class="auth-hero__logo" />
+      <h1>ClassTrack</h1>
+      <p>Your attendance and timetable, always up to date.</p>
+    </div>
+    <div class="auth-actions">
+      <button id="btnGoLogin" class="btn btn--primary">Log In</button>
+      <button id="btnGoRegister" class="btn btn--ghost">Create Account</button>
+    </div>
+  </section>
+
+  <!-- Login -->
+  <section class="auth-view" data-auth-view="login">
+    <button class="btn-icon back-btn" data-back-welcome aria-label="Back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <h2>Welcome back</h2>
+    <p class="auth-sub">Log in with your Roll Number.</p>
+    <form id="loginForm" class="form" autocomplete="on">
+      <label class="field">
+        <span>Roll Number</span>
+        <input id="loginRoll" name="rollNumber" type="text" autocomplete="username" required />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input id="loginPassword" name="password" type="password" autocomplete="current-password" required />
+      </label>
+      <button id="loginSubmitBtn" type="submit" class="btn btn--primary btn--block">
+        <span class="btn__label">Log In</span>
+      </button>
+    </form>
+    <p class="auth-switch">New here? <button type="button" class="link-btn" id="btnGoRegisterFromLogin">Create an account</button></p>
+  </section>
+
+  <!-- Register -->
+  <section class="auth-view" data-auth-view="register">
+    <button class="btn-icon back-btn" data-back-welcome aria-label="Back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <h2>Create your account</h2>
+    <p class="auth-sub">Link your account to your existing college record.</p>
+
+    <form id="registerForm" class="form" autocomplete="off">
+
+      <div class="photo-picker">
+        <label class="photo-trigger" for="regPhotoInput">
+          <img id="regPhotoThumb" class="photo-trigger__img" src="" alt="" />
+          <span class="photo-trigger__label">Choose Photo</span>
+        </label>
+        <input id="regPhotoInput" type="file" accept="image/*" class="visually-hidden" />
+        <p class="field-helper">Optional — a default avatar is used if skipped.</p>
+      </div>
+
+      <label class="field">
+        <span>Roll Number</span>
+        <input id="rollNumberInput" name="rollNumber" type="text" required />
+      </label>
+      <p id="rollLookupHelper" class="field-helper"></p>
+
+      <label class="field">
+        <span>Name</span>
+        <input id="regNameInput" name="name" type="text" disabled required />
+      </label>
+
+      <label class="field">
+        <span>Email Address</span>
+        <input id="regEmailInput" name="email" type="email" required />
+      </label>
+      <label class="field">
+        <span>Mobile Number</span>
+        <input id="regMobileInput" name="mobile" type="tel" required />
+      </label>
+      <label class="field">
+        <span>Department</span>
+        <input id="regDeptInput" name="department" type="text" required />
+      </label>
+      <label class="field">
+        <span>Class</span>
+        <input id="regClassInput" name="class" type="text" required />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input id="regPasswordInput" name="password" type="password" required minlength="6" />
+      </label>
+      <label class="field">
+        <span>Confirm Password</span>
+        <input id="regConfirmInput" name="confirm" type="password" required minlength="6" />
+      </label>
+
+      <button id="registerSubmitBtn" type="submit" class="btn btn--primary btn--block">
+        <span class="btn__label">Create Account</span>
+      </button>
+    </form>
+  </section>
+</div>
+
+<!-- ============================================================ -->
+<!-- APP SHELL                                                      -->
+<!-- ============================================================ -->
+<div id="appShell" class="app-shell is-hidden">
+
+  <!-- Sidebar (desktop) -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <img src="./logo.png" alt="ClassTrack logo" class="sidebar__logo" />
+      <span>ClassTrack</span>
+    </div>
+    <nav class="sidebar__nav">
+      <button class="nav-item is-active" data-nav="dashboard-attendance">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Attendance</span>
+      </button>
+      <button class="nav-item" data-nav="dashboard-timetable">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="15" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Timetable</span>
+      </button>
+      <button class="nav-item" data-nav="dashboard-summary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M12 20V4M20 20v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Summary</span>
+      </button>
+      <button class="nav-item" data-nav="dashboard-profile">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c1.4-3.6 4.2-5.5 7-5.5s5.6 1.9 7 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Profile</span>
+      </button>
+      <button class="nav-item" data-nav="dashboard-about">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 11v5M12 8v.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>About</span>
+      </button>
+    </nav>
+    <button id="btnInstallApp" class="btn btn--ghost btn--sm sidebar__install is-hidden">Install App</button>
+    <button id="btnLogoutSidebar" class="nav-item nav-item--logout">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Log Out</span>
+    </button>
+  </aside>
+
+  <main class="content">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar__title" id="topbarTitle">Attendance</div>
+      <div class="topbar__actions">
+        <button class="btn-icon" data-theme-toggle aria-label="Toggle theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/></svg>
+        </button>
+        <img data-profile-photo class="topbar__avatar" src="" alt="Profile" />
+      </div>
+    </header>
+
+    <!-- ATTENDANCE VIEW -->
+    <section id="dashboard-attendance" class="view is-active">
+      <div class="view-header">
+        <input id="attendanceDate" type="date" class="date-input" />
+      </div>
+      <p id="attendanceMeta" class="view-meta"></p>
+      <div id="attendanceHours" class="hour-list"></div>
+    </section>
+
+    <!-- TIMETABLE VIEW -->
+    <section id="dashboard-timetable" class="view">
+      <div class="chip-row" id="dayOrderChips">
+        <button class="chip is-active" data-dayorder="1">DO 1</button>
+        <button class="chip" data-dayorder="2">DO 2</button>
+        <button class="chip" data-dayorder="3">DO 3</button>
+        <button class="chip" data-dayorder="4">DO 4</button>
+        <button class="chip" data-dayorder="5">DO 5</button>
+        <button class="chip" data-dayorder="6">DO 6</button>
+      </div>
+      <div id="timetableHours" class="hour-list"></div>
+    </section>
+
+    <!-- SUMMARY VIEW -->
+    <section id="dashboard-summary" class="view">
+      <div id="summaryGrid" class="stat-grid"></div>
+      <div id="summaryExtra"></div>
+    </section>
+
+    <!-- PROFILE VIEW -->
+    <section id="dashboard-profile" class="view">
+      <div id="profileView" class="profile-card">
+        <img data-profile-photo class="profile-card__photo" src="" alt="" />
+        <h2 data-profile-name></h2>
+        <p class="profile-card__roll">Roll No. <span data-profile-roll></span></p>
+        <dl class="profile-list">
+          <dt>Email</dt><dd id="profileEmail"></dd>
+          <dt>Mobile</dt><dd id="profileMobile"></dd>
+          <dt>Department</dt><dd id="profileDept"></dd>
+          <dt>Class</dt><dd id="profileClass"></dd>
+        </dl>
+        <button id="btnEditProfile" class="btn btn--primary btn--block">Edit Profile</button>
+        <button id="btnLogout" class="btn btn--ghost btn--block">Log Out</button>
+      </div>
+
+      <div id="profileEditView" class="profile-card is-hidden">
+        <h2>Edit Profile</h2>
+        <form id="profileEditForm" class="form">
+          <div class="photo-picker">
+            <label class="photo-trigger" for="editPhotoInput">
+              <img id="editPhotoThumb" class="photo-trigger__img" src="" alt="" />
+              <span class="photo-trigger__label">Change Photo</span>
+            </label>
+            <input id="editPhotoInput" type="file" accept="image/*" class="visually-hidden" />
+          </div>
+          <label class="field">
+            <span>Roll Number</span>
+            <input value="" data-profile-roll-input type="text" disabled />
+          </label>
+          <label class="field"><span>Name</span><input id="editNameInput" type="text" required /></label>
+          <label class="field"><span>Email</span><input id="editEmailInput" type="email" required /></label>
+          <label class="field"><span>Mobile</span><input id="editMobileInput" type="tel" required /></label>
+          <label class="field"><span>Department</span><input id="editDeptInput" type="text" required /></label>
+          <label class="field"><span>Class</span><input id="editClassInput" type="text" required /></label>
+          <div class="form-actions">
+            <button type="button" id="btnCancelEdit" class="btn btn--ghost">Cancel</button>
+            <button type="submit" id="profileSaveBtn" class="btn btn--primary"><span class="btn__label">Save Changes</span></button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ABOUT VIEW -->
+    <section id="dashboard-about" class="view">
+      <div class="dev-card">
+        <h2>About the <span class="dev-card__accent">Developer</span></h2>
+        <div class="dev-card__body">
+          <img src="./my img.png" alt="Mohanraj" class="dev-card__photo" />
+          <div class="dev-card__text">
+            <p>This app was developed by <strong>Mohanraj</strong>, a technology enthusiast with a strong interest in building creative and useful digital solutions.</p>
+            <p>He is a vibe coder with good knowledge in coding and web technologies. He loves designing, coding, and exploring new technologies to turn ideas into real, user-friendly applications.</p>
+          </div>
+        </div>
+        <div class="dev-card__socials">
+          <a href="https://www.instagram.com/mohan._2_2?igsh=MWVsbGIybDk0ZmQyOA==" target="_blank" rel="noopener noreferrer" class="dev-social" aria-label="Instagram">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg>
+            <span>Instagram</span>
+          </a>
+          <a href="https://github.com/mohanraj132212-collab" target="_blank" rel="noopener noreferrer" class="dev-social" aria-label="GitHub">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.58 2 12.2c0 4.49 2.87 8.3 6.84 9.65.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.6.69.49A10.02 10.02 0 0 0 22 12.2C22 6.58 17.52 2 12 2Z" fill="currentColor"/></svg>
+            <span>GitHub</span>
+          </a>
+          <a href="https://www.linkedin.com/in/mohanraj-a-983b2b371?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener noreferrer" class="dev-social" aria-label="LinkedIn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M7.5 10.5v6M7.5 7.9v.1M11.5 16.5v-3.6c0-1.4.9-2.4 2.2-2.4s2.1 1 2.1 2.4v3.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <span>LinkedIn</span>
+          </a>
+          <a href="mailto:mohanraj132212@email.com" class="dev-social" aria-label="Email">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4 6.5l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Email</span>
+          </a>
+        </div>
+        <p class="dev-card__tagline">"Turning Ideas into Digital Experiences."</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom nav (mobile) -->
+  <nav class="bottom-nav">
+    <button class="nav-item is-active" data-nav="dashboard-attendance">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18M8 2v4M16 2v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>Attendance</span>
+    </button>
+    <button class="nav-item" data-nav="dashboard-timetable">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="15" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span>Timetable</span>
+    </button>
+    <button class="nav-item" data-nav="dashboard-summary">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M12 20V4M20 20v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Summary</span>
+    </button>
+    <button class="nav-item" data-nav="dashboard-profile">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c1.4-3.6 4.2-5.5 7-5.5s5.6 1.9 7 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- Photo adjust modal (shared by register + edit profile) -->
+<div id="photoModal" class="modal-overlay is-hidden">
+  <div class="modal-card">
+    <h3>Adjust photo</h3>
+    <div class="modal-photo-preview">
+      <div id="modalCropperHost" class="cropper-host"></div>
+    </div>
+    <input id="modalZoomRange" type="range" min="0" max="100" value="0" class="zoom-slider" aria-label="Zoom" />
+    <div class="modal-actions">
+      <button type="button" id="modalCancelBtn" class="btn btn--ghost">Cancel</button>
+      <button type="button" id="modalUseBtn" class="btn btn--primary">Use photo</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
